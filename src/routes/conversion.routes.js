@@ -39,12 +39,15 @@ router.post("/conversion", async (req, res) => {
       };
     }
   }
-
+  console.log(result);
   res.status(200);
   res.send({
     currency: [
       { ...result[0], price: 1 },
-      { ...result[1], price: (result[0].price / result[1].price).toFixed(2) },
+      {
+        ...result[1],
+        price: parseFloat(result[0].price / result[1].price).toFixed(4),
+      },
     ],
   });
   res.end();
