@@ -39,7 +39,7 @@ router.post("/conversion", async (req, res) => {
       };
     }
   }
-  console.log(result);
+
   res.status(200);
   res.send({
     currency: [
