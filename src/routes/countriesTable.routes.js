@@ -1,48 +1,43 @@
 const express = require("express");
-const request = require("request");
+const axios = require("axios");
 let cc = require("currency-codes");
 
 const router = express.Router();
 
-router.post("/table", (req, res) => {
-  try {
-    request(
-      "https://api.nbp.pl/api/exchangerates/tables/a/?format=json",
-      (error, response, body) => {
-        if (error) {
-          throw error;
-        } else {
-          let exchangeNames = [];
+router.post("/table", async (req, res) => {
+  let exchangeNames = [];
 
-          for (let i = 0; i < JSON.parse(body)[0].rates.length; i++) {
-            let exchangePricing = JSON.parse(body)[0].rates[i];
+  await axios
+    .get("https://api.nbp.pl/api/exchangerates/tables/a/?format=json")
+    .then((response) => {
+      const rates = response.data[0].rates;
+      for (let i = 0; i < rates.length; i++) {
+        let exchangePricing = rates[i];
 
-            const UNCode = cc.code(exchangePricing.code).number;
-            exchangeNames.push({
-              currency: exchangePricing.currency,
-              code: exchangePricing.code,
-              flagURL: `https://countryflagsapi.com/svg/${UNCode}`,
-              price: exchangePricing.mid.toFixed(2),
-            });
-          }
+        const UNCode = cc.code(exchangePricing.code).number;
 
-          exchangeNames.push({
-            currency: "polski złoty",
-            code: "PLN",
-            flagURL: `https://countryflagsapi.com/svg/${616}`,
-            price: 1,
-          });
+        exchangeNames.push({
+          currency: exchangePricing.currency,
+          code: exchangePricing.code,
+          flagURL: `https://countryflagsapi.com/svg/${UNCode}`,
+          price: exchangePricing.mid,
+        });
+      }
 
-          res.status(200);
-          res.send(JSON.stringify(exchangeNames));
-          res.end();
-        }
-      },
-    );
-  } catch {
-    res.status(500);
-    res.end();
-  }
+      exchangeNames.push({
+        currency: "polski złoty",
+        code: "PLN",
+        flagURL: `https://countryflagsapi.com/svg/${616}`,
+        price: 1,
+      });
+    })
+    .catch((err) => {
+      throw err;
+    });
+
+  res.status(200);
+  res.send(JSON.stringify(exchangeNames));
+  res.end();
 });
 
 exports.countries = router;
