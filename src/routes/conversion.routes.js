@@ -1,5 +1,4 @@
 const express = require("express");
-
 const axios = require("axios");
 let cc = require("currency-codes");
 
@@ -46,7 +45,7 @@ router.post("/conversion", async (req, res) => {
       { ...result[0], price: 1 },
       {
         ...result[1],
-        price: parseFloat(result[0].price / result[1].price).toFixed(4),
+        price: parseFloat(result[0].price / result[1].price),
       },
     ],
   });
