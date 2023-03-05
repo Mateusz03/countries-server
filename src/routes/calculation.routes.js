@@ -7,7 +7,7 @@ router.post("/calculation", (req, res) => {
   let input = req.body.body.inputs;
 
   for (let i = 0; i < input.length; i++) {
-    if (input[i].message !== "") {
+    if (input[i].message !== "" && !isNaN(parseInt(input[i].message))) {
       if (i === 0) {
         input[1].message = (
           parseFloat(input[i].message) * parseFloat(rates)
@@ -23,6 +23,8 @@ router.post("/calculation", (req, res) => {
         res.send({ inputs: input });
         break;
       }
+    } else {
+      res.end();
     }
   }
 });
